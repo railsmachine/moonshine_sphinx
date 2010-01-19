@@ -6,8 +6,8 @@ A plugin for installing and managing sphinx.
 
 === Instructions
 
-* <tt>script/plugin install git://github.com/ACCOUNT/moonshine_sphinx.git</tt>
-* <tt>script/plugin install git://github.com/ACCOUNT/moonshine_god.git</tt>
+* <tt>script/plugin install git://github.com/railsmachine/moonshine_sphinx.git</tt>
+* <tt>script/plugin install git://github.com/railsmachine/moonshine_god.git</tt>
 * edit sphinx.god in the <tt>templates</tt> directory and save to <tt>config/god/</tt>
 * Configure settings if needed
     configure(:sphinx => {:version => '0.9.9'}) # 0.9.8.1 is the default
