@@ -9,14 +9,17 @@ God.watch do |w|
   w.uid = 'rails'
   w.gid = 'rails'
 
-  w.start         = "searchd --config /srv/YOURAPP/current/config/production.sphinx.conf"
+  w.env = { 'RAILS_ENV' => RAILS_ENV }
+
+  w.start         = "searchd --config #{RAILS_ROOT}/config/#{RAILS_ENV}.sphinx.conf"
   w.start_grace   = 10.seconds
-  w.stop          = "searchd --config /srv/YOURAPP/current/config/production.sphinx.conf --stop"
+  w.stop          = "searchd --config #{RAILS_ROOT}/config/#{RAILS_ENV}.sphinx.conf --stop"
   w.stop_grace    = 10.seconds
   w.restart       = w.stop + " && " + w.start
   w.restart_grace = 15.seconds
 
-  w.pid_file = "/srv/YOURAPP/current/tmp/pids/sphinx.pid"
+  w.log      = File.join(RAILS_ROOT, 'log', "#{w.name}-god.log")
+  w.pid_file = File.join(RAILS_ROOT, 'log', "searchd.#{RAILS_ENV}.pid")
 
   w.behavior(:clean_pid_file)
 
