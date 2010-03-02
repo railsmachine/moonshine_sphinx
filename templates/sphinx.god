@@ -1,8 +1,7 @@
 # Replace YOURAPP with the name of your application
 # Edit the location of the sphinx.conf file if necessary
 God.watch do |w|
-  w.group = "YOURAPP-sphinx"
-  w.name  = w.group + "-1"
+  w.name = "<%= configuration[:application] %>-sphinx"
 
   w.interval = 30.seconds
 
@@ -11,9 +10,9 @@ God.watch do |w|
 
   w.env = { 'RAILS_ENV' => RAILS_ENV }
 
-  w.start         = "searchd --config #{RAILS_ROOT}/config/#{RAILS_ENV}.sphinx.conf"
+  w.start         = "searchd --config <%= sphinx_configuration[:config_file] %>"
   w.start_grace   = 10.seconds
-  w.stop          = "searchd --config #{RAILS_ROOT}/config/#{RAILS_ENV}.sphinx.conf --stop"
+  w.stop          = "searchd --config <%= sphinx_configuration[:config_file] %> --stop"
   w.stop_grace    = 10.seconds
   w.restart       = w.stop + " && " + w.start
   w.restart_grace = 15.seconds
