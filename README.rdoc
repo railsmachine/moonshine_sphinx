@@ -7,6 +7,7 @@ A plugin for installing and managing sphinx for a Rails application using thinki
  * Ensuring sphinx is installed
  * Using God managing and monitoring searchd
  * Adding capistrano hooks to restart searchd on deploy
+ * Optionally adding a cron job for running the indexer
 
 moonshine_sphinx requires:
 
@@ -20,9 +21,20 @@ moonshine_sphinx requires:
 * <tt>script/plugin install git://github.com/railsmachine/moonshine_god.git</tt>
 * <tt>rake moonshine:gems</tt> if you <tt>config/gems.yml</tt> if you're using thinking_sphinx as a gem
 
-* Configure settings if needed:
-    configure(:sphinx => {:version => '0.9.9'}) # 0.9.8.1 is the default
+* Configure settings as needed:
+    # in app/manifests/application_manifest.rb
+    configure :sphinx => {
+      :version => '0.9.9' # 0.9.8.1 is the default
+      # run the cron every hour at 9 (no default)
+      :index_cron => {
+        :minute => 9 
+      }
+    } 
+    # or in config/moonshine.yml
+    :sphinx:
+      :version: 0.9.9
+      # run the cron every hour at 9 (no default)
+      :index_cron:
+        :minute: 9
 * Include the recipe in your Moonshine manifest:
     recipe :sphinx
-
-
