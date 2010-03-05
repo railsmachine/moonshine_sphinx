@@ -11,17 +11,13 @@ module Sphinx
 
       # We need god in our lives to start/stop/monitor searchd
       recipe :god
-
-      if sphinx_yml.exist?
-        configure :sphinx => YAML::load(template(sphinx_yml, binding))
-      end
-
     end
   end
 
   module ClassMethods
     def sphinx_yml
-      rails_root.join('config', 'sphinx.yml')
+      @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + 'shared/config/sphinx.yml'
+      #rails_root.join('config', 'sphinx.yml')
     end
 
     def sphinx_configuration
@@ -43,40 +39,56 @@ module Sphinx
   #  plugin :sphinx
   #  recipe :sphinx
   def sphinx(options = {})
-    if ! sphinx_yml.exist?
-      raise <<END
-Expected #{sphinx_yml} to exist and be a YAML file containing a stanza for #{rails_env} like:
+    configure :sphinx => YAML::load(template(sphinx_template_dir + 'sphinx.yml', binding))
 
-searchd_file_path: #{configuration[:deploy_to]}/shared/sphinx/#{rails_env}
-searchd_files: #{configuration[:deploy_to]}/shared/sphinx/#{rails_env}
-config_file: #{configuration[:deploy_to]}/shared/shared/sphinx.conf
-bin_path: /usr/local/bin
-END
+    [:searchd_files, :searchd_file_path].each do |config|
+      dir = sphinx_configuration[config]
+      raise "Expected #{sphinx_yml} to set '#{config}' for '#{rails_env}', but it did not. A decent value to set it to is: #{configuration[:deploy_to]}/shared/sphinx/#{rails_env}" unless dir
+      file dir,
+        :ensure => :directory,
+        :recurse => true,
+        :owner => configuration[:user],
+        :group => configuration[:group] || configuration[:user],
+        :mode => '775'
     end
 
-    if sphinx_configuration
-      if sphinx_configuration[:bin_path] != '/usr/local/bin'
-        raise "Expected #{sphinx_yml} to set 'bin_path' for '#{rails_env}' to  '/usr/local/bin', but was #{sphinx_configuration[:bin_path].inspect}" 
-      end
+    file rails_root + 'db/sphinx',
+      :ensure => sphinx_configuration[:searchd_files] ,
+      :force => true
 
-      unless sphinx_configuration[:config_file]
-        raise "Expected #{sphinx_yml} to set 'config_file' for '#{rails_env}', but it did not. A decent value to set it to is: #{configuration[:deploy_to]}/shared/config/#{rails_env}.sphinx.conf"
-      end
+    file sphinx_yml.to_s,
+      :content => template(sphinx_template_dir.join('sphinx.yml')),
+      :ensure => :file,
+      :owner => configuration[:user],
+      :group => configuration[:group] || configuration[:user],
+      :mode => '664'
 
-      [:searchd_files, :searchd_file_path].each do |config|
-        dir = sphinx_configuration[config]
-        raise "Expected #{sphinx_yml} to set '#{config}' for '#{rails_env}', but it did not. A decent value to set it to is: #{configuration[:deploy_to]}/shared/sphinx/#{rails_env}" unless dir
-        file dir,
-          :ensure => :directory,
-          :owner => configuration[:user],
-          :group => configuration[:group] || configuration[:user],
-          :mode => '775'
-      end
+    file rails_root + 'config/sphinx.yml',
+      :ensure => sphinx_yml.to_s,
+      :require => file(sphinx_yml.to_s)
 
+    rake "thinking_sphinx:configure",
+      :refreshonly => true,
+      :subscribe => file(sphinx_yml),
+      :require => exec('sphinx')
 
-    else
-      raise "#{sphinx_yml} existed, but didn't define configuration for #{rails_env}"
-    end
+    file sphinx_configuration[:config_file],
+      :ensure => :file,
+      :owner => configuration[:user],
+      :group => configuration[:group] || configuration[:user],
+      :mode => '664'
+
+    rake "thinking_sphinx:index",
+      :require => [
+        file(sphinx_configuration[:searchd_files]),
+        exec('rake thinking_sphinx:configure'),
+        exec('rake db:migrate'),
+        exec('sphinx')
+      ],
+      :subscribe => file(sphinx_configuration[:config_file])
+
+    exec "god restart #{configuration[:application]}-sphinx",
+      :require => exec("rake thinking_sphinx:index")
 
     package 'wget', :ensure => :installed
 
@@ -103,16 +115,16 @@ END
        :content => template(sphinx_template_dir.join('sphinx.god')),
        :notify => exec('restart_god')
 
-     if configuration[:sphinx][:index_cron]
-       current_rails_root = "#{configuration[:deploy_to]}/current"
-       thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
-       cron_options = {
-         :command => thinking_sphinx_index,
-         :user => configuration[:user]
-       }.merge(configuration[:sphinx][:index_cron])
+     # Set default here instead of in included so that :minute doesn't get deep_merged with user settings
+     configuration[:sphinx][:index_cron] ||= { :minute => 9 }
+     current_rails_root = "#{configuration[:deploy_to]}/current"
+     thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
+     cron_options = {
+       :command => thinking_sphinx_index,
+       :user => configuration[:user]
+     }.merge(configuration[:sphinx][:index_cron])
 
-       cron "thinking_sphinx:index", cron_options
-     end
+     cron "thinking_sphinx:index", cron_options
   end
 
 end

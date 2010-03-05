@@ -1,0 +1,5 @@
+<%= rails_env %>:
+  searchd_file_path: <%= configuration[:deploy_to] %>/shared/sphinx/<%= rails_env %>
+  searchd_files: <%= configuration[:deploy_to] %>/shared/sphinx/<%= rails_env %>
+  config_file: <%= configuration[:deploy_to] %>/shared/config/sphinx.conf
+  bin_path: /usr/local/bin

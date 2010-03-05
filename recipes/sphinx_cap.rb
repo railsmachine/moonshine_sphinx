@@ -19,20 +19,9 @@ namespace :sphinx do
     run "rake -f #{current_path}/Rakefile ts:config RAILS_ENV=#{fetch(:rails_env, 'production')}"
   end
 
-  task :symlink_db do
-    run "mkdir -p #{shared_path}/sphinx"
-    run "ln -nfs #{shared_path}/sphinx #{release_path}/db/sphinx"
-  end
-
   desc "Reconfigures sphinx, and then restarts"
   task :restart do
-    sphinx.configure
     sudo "god restart #{application}-sphinx || true"
   end
 
-end
-
-after :deploy do
-  sphinx.symlink_db
-  sphinx.restart
 end
