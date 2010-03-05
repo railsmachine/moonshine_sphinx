@@ -47,9 +47,9 @@ module Sphinx
       raise <<END
 Expected #{sphinx_yml} to exist and be a YAML file containing a stanza for #{rails_env} like:
 
-searchd_file_path: /srv/#{application}/shared/sphinx/#{rails_env}
-searchd_files: /srv/#{application}/shared/sphinx/#{rails_env}
-config_file: /srv/#{application}/shared/config/#{rails_env}.sphinx.conf
+searchd_file_path: #{configuration[:deploy_to]}/shared/sphinx/#{rails_env}
+searchd_files: #{configuration[:deploy_to]}/shared/sphinx/#{rails_env}
+config_file: #{configuration[:deploy_to]}/shared/shared/sphinx.conf
 bin_path: /usr/local/bin
 END
     end
