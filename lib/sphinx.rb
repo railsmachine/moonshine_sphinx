@@ -9,8 +9,6 @@ module Sphinx
       configure :sphinx => { :version => '0.9.8.1' }
       configure :rails_logrotate => {}
 
-      # We need god in our lives to start/stop/monitor searchd
-      recipe :god
     end
   end
 
@@ -39,6 +37,13 @@ module Sphinx
   #  plugin :sphinx
   #  recipe :sphinx
   def sphinx(options = {})
+    if respond_to?(:god)
+      # We need god in our lives to start/stop/monitor searchd
+      recipe :god
+    else
+      raise "Could not find god recipe, aborting. Please install moonshine_god recipe: script/plugin install  git://github.com/railsmachine/moonshine_god.git and redeploy"
+    end
+
     configure :sphinx => YAML::load(template(sphinx_template_dir + 'sphinx.yml', binding))
 
     [:searchd_files, :searchd_file_path].each do |config|
