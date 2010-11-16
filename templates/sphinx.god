@@ -5,8 +5,8 @@ God.watch do |w|
 
   w.interval = 30.seconds
 
-  w.uid = 'rails'
-  w.gid = 'rails'
+  w.uid = '<%= configuration[:user] %>'
+  w.gid = '<%= configuration[:user] %>'
 
   w.env = { 'RAILS_ENV' => RAILS_ENV }
 
