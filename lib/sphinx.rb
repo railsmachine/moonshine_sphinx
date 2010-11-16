@@ -52,8 +52,7 @@ module Sphinx
         :ensure => :directory,
         :recurse => true,
         :owner => configuration[:user],
-        :group => configuration[:group] || configuration[:user],
-        :mode => '775'
+        :group => configuration[:group] || configuration[:user]
     end
 
     file rails_root + 'db/sphinx',
