@@ -4,16 +4,16 @@
 
 A plugin for installing and managing sphinx for a Rails application using thinking_sphinx. It handles:
 
- * Ensuring sphinx is installed
- * Using God managing and monitoring searchd
- * Adding capistrano hooks to restart searchd on deploy
- * Optionally adding a cron job for running the indexer
+* Ensuring sphinx is installed
+* Using God managing and monitoring searchd
+* Adding capistrano hooks to restart searchd on deploy
+* Optionally adding a cron job for running the indexer
 
 moonshine_sphinx requires:
 
- * At least revision <blah> of moonshine
- * moonshine_god to be installed as a plugin
- * thinking_sphinx installed and configured
+* At least revision cf2c44881e49633a8507149024e1f2dcbf63335e[http://github.com/railsmachine/moonshine/commit/cf2c44881e49633a8507149024e1f2dcbf63335e] of moonshine
+* moonshine_god to be installed as a plugin
+* thinking_sphinx installed and configured
 
 === Instructions
 
@@ -24,16 +24,16 @@ moonshine_sphinx requires:
 * Configure settings as needed:
     # in app/manifests/application_manifest.rb
     configure :sphinx => {
-      :version => '0.9.9' # 0.9.8.1 is the default
-      # run the cron every hour at 9 (no default)
+      :version => '0.9.8.1'
+      # index very hour at 9
       :index_cron => {
         :minute => 9 
       }
     } 
     # or in config/moonshine.yml
     :sphinx:
-      :version: 0.9.9
-      # run the cron every hour at 9 (no default)
+      :version: 0.9.8.1
+      # index every hour at 9
       :index_cron:
         :minute: 9
 * Include the recipe in your Moonshine manifest:
