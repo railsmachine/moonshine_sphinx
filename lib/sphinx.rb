@@ -15,7 +15,6 @@ module Sphinx
   module ClassMethods
     def sphinx_yml
       @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + 'shared/config/sphinx.yml'
-      #rails_root.join('config', 'sphinx.yml')
     end
 
     def sphinx_configuration
