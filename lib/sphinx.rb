@@ -59,12 +59,20 @@ module Sphinx
       :ensure => sphinx_configuration[:searchd_files] ,
       :force => true
 
+    file configuration[:deploy_to] + '/shared/sphinx',
+      :ensure => :directory,
+      :owner => configuration[:user],
+      :group => configuration[:group] || configuration[:user],
+      :mode => '664',
+      :alias => 'searchd shared files'
+
     file sphinx_yml.to_s,
       :content => template(sphinx_template_dir.join('sphinx.yml')),
       :ensure => :file,
       :owner => configuration[:user],
       :group => configuration[:group] || configuration[:user],
-      :mode => '664'
+      :mode => '664',
+      :require => file('searchd shared files')
 
     file rails_root + 'config/sphinx.yml',
       :ensure => sphinx_yml.to_s,
