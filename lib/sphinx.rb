@@ -122,6 +122,7 @@ module Sphinx
      })
 
      file "/etc/god/#{configuration[:application]}-sphinx.god",
+       :ensure => :present,
        :require => file('/etc/god/god.conf'),
        :content => template(sphinx_template_dir.join('sphinx.god')),
        :notify => exec('restart_god')
