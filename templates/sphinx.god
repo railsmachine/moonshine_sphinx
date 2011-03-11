@@ -1,5 +1,3 @@
-# Replace YOURAPP with the name of your application
-# Edit the location of the sphinx.conf file if necessary
 God.watch do |w|
   w.name = "<%= configuration[:application] %>-sphinx"
 
@@ -17,8 +15,8 @@ God.watch do |w|
   w.restart       = w.stop + " && " + w.start
   w.restart_grace = 15.seconds
 
-  w.log      = '<%= configuration[:deploy_to] %>/shared/log/sphinx.god.log'
-  w.pid_file = '<%= configuration[:deploy_to] %>/shared/log/sphinx.pid'
+  w.log      = '<%= configuration[:deploy_to] %>/shared/log/searchd.god.log'
+  w.pid_file = '<%= configuration[:deploy_to] %>/shared/log/searchd.pid'
 
   w.behavior(:clean_pid_file)
 
