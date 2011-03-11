@@ -17,8 +17,8 @@ God.watch do |w|
   w.restart       = w.stop + " && " + w.start
   w.restart_grace = 15.seconds
 
-  w.log      = File.join(RAILS_ROOT, 'log', "#{w.name}-god.log")
-  w.pid_file = File.join(RAILS_ROOT, 'log', "searchd.#{RAILS_ENV}.pid")
+  w.log      = '<%= configuration[:deploy_to] %>/shared/log/sphinx.god.log'
+  w.pid_file = '<%= configuration[:deploy_to] %>/shared/log/sphinx.pid'
 
   w.behavior(:clean_pid_file)
 
