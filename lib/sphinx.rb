@@ -98,12 +98,6 @@ module Sphinx
       ],
       :subscribe => file(sphinx_configuration[:config_file])
 
-    exec "god restart #{configuration[:application]}-sphinx",
-      :require => [
-        exec("rake thinking_sphinx:index"),
-        file("/etc/god/#{configuration[:application]}-sphinx.god")
-      ]
-
     package 'wget', :ensure => :installed
 
     exec 'sphinx',
