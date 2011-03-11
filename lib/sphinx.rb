@@ -81,7 +81,10 @@ module Sphinx
     rake "thinking_sphinx:configure",
       :refreshonly => true,
       :subscribe => file(sphinx_yml),
-      :require => exec('sphinx')
+      :require => [
+        exec('sphinx'),
+        exec('rails_gems')
+      ]
 
     file sphinx_configuration[:config_file],
       :ensure => :file,
@@ -94,7 +97,8 @@ module Sphinx
         file(sphinx_configuration[:searchd_files]),
         exec('rake thinking_sphinx:configure'),
         exec('rake db:migrate'),
-        exec('sphinx')
+        exec('sphinx'),
+        exec('rails_gems')
       ],
       :subscribe => file(sphinx_configuration[:config_file])
 
