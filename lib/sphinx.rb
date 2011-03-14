@@ -44,6 +44,7 @@ module Sphinx
     end
 
     configure :sphinx => YAML::load(template(sphinx_template_dir + 'sphinx.yml', binding))
+    sphinx_config_only
 
     [:searchd_files, :searchd_file_path].each do |config|
       dir = sphinx_configuration[config]
@@ -66,24 +67,13 @@ module Sphinx
       :mode => '664',
       :alias => 'searchd shared files'
 
-    file sphinx_yml.to_s,
-      :content => template(sphinx_template_dir.join('sphinx.yml')),
-      :ensure => :file,
-      :owner => configuration[:user],
-      :group => configuration[:group] || configuration[:user],
-      :mode => '664',
-      :require => file('searchd shared files')
-
-    file rails_root + 'config/sphinx.yml',
-      :ensure => sphinx_yml.to_s,
-      :require => file(sphinx_yml.to_s)
-
     rake "thinking_sphinx:configure",
       :refreshonly => true,
       :subscribe => file(sphinx_yml),
       :require => [
         exec('sphinx'),
-        exec('rails_gems')
+        exec('rails_gems'),
+        file('searchd shared files')
       ]
 
     file sphinx_configuration[:config_file],
@@ -136,6 +126,21 @@ module Sphinx
      }.merge(configuration[:sphinx][:index_cron] || {:minute => 9}) # Set default here instead of in included so that :minute doesn't get deep_merged with user settings
 
      cron "thinking_sphinx:index", cron_options
+  end
+
+  # Just configure sphinx.yml. Useful on app servers when sphinx is on a shared
+  # server
+  def sphinx_config_only
+    file sphinx_yml.to_s,
+      :content => template(sphinx_template_dir.join('sphinx.yml')),
+      :ensure => :file,
+      :owner => configuration[:user],
+      :group => configuration[:group] || configuration[:user],
+      :mode => '664'
+
+    file rails_root + 'config/sphinx.yml',
+      :ensure => sphinx_yml.to_s,
+      :require => file(sphinx_yml.to_s)
   end
 
 end
