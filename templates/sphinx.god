@@ -31,6 +31,9 @@ God.watch do |w|
     restart.condition(:memory_usage) do |c|
       c.above = 100.megabytes
       c.times = [3, 5] # 3 out of 5 intervals
+<% if configuration[:sphinx][:god] && configuration[:sphinx][:god][:restart_notify] %>
+      c.notify = "<%= configuration[:sphinx][:god][:restart_notify] %>"
+<% end %>
     end
   end
 
@@ -43,6 +46,9 @@ God.watch do |w|
       c.retry_in      = 10.minutes
       c.retry_times   = 5
       c.retry_within  = 2.hours
+<% if configuration[:sphinx][:god] && configuration[:sphinx][:god][:flapping_notify] %>
+      c.notify = "<%= configuration[:sphinx][:god][:flapping_notify] %>"
+<% end %>
     end
   end
 end
