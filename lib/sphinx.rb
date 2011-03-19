@@ -81,15 +81,17 @@ module Sphinx
       :group => configuration[:group] || configuration[:user],
       :mode => '664'
 
-    rake "thinking_sphinx:index",
-      :require => [
-        file(sphinx_configuration[:searchd_files]),
-        exec('rake thinking_sphinx:configure'),
-        exec('rake db:migrate'),
-        exec('sphinx'),
-        exec('rails_gems')
-      ],
-      :subscribe => file(sphinx_configuration[:config_file])
+    unless configuration[:sphinx][:index_on_deploy] == false
+      rake "thinking_sphinx:index",
+        :require => [
+          file(sphinx_configuration[:searchd_files]),
+          exec('rake thinking_sphinx:configure'),
+          exec('rake db:migrate'),
+          exec('sphinx'),
+          exec('rails_gems')
+        ],
+        :subscribe => file(sphinx_configuration[:config_file])
+    end
 
     package 'wget', :ensure => :installed
 
