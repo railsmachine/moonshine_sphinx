@@ -29,9 +29,9 @@ moonshine_sphinx requires:
       # index every hour at 9
       :index_cron:
         :minute: 9
-        :extra:
-          # these settings are loaded as if they were in your sphinx.yml
-          :address: 127.0.0.1
-          :mem_limit: 256M
+      :extra:
+        # these settings are loaded as if they were in your sphinx.yml
+        :address: 127.0.0.1
+        :mem_limit: 256M
 * Include the recipe in your Moonshine manifest:
     recipe :sphinx
