@@ -55,7 +55,7 @@ module Sphinx
         :group => configuration[:group] || configuration[:user]
     end
 
-    file rails_root + 'db/sphinx',
+    file rails_root.to_s + '/db/sphinx',
       :ensure => sphinx_configuration[:searchd_files] ,
       :force => true
 
@@ -141,7 +141,7 @@ module Sphinx
       :group => configuration[:group] || configuration[:user],
       :mode => '664'
 
-    file rails_root + 'config/sphinx.yml',
+    file rails_root.to_s + '/config/sphinx.yml',
       :ensure => sphinx_yml.to_s,
       :require => file(sphinx_yml.to_s)
   end
