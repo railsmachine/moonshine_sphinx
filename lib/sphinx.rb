@@ -6,7 +6,7 @@ module Sphinx
     manifest.class_eval do
       extend ClassMethods
 
-      configure :sphinx => { :version => '0.9.8.1', :extra => {} }
+      configure :sphinx => { :version => '0.9.8.1', :extra => {}, :use_god => true }
       configure :rails_logrotate => {}
 
     end
@@ -36,11 +36,13 @@ module Sphinx
   #  plugin :sphinx
   #  recipe :sphinx
   def sphinx(options = {})
-    if respond_to?(:god)
-      # We need god in our lives to start/stop/monitor searchd
-      recipe :god
-    else
-      raise "Could not find god recipe, aborting. Please install moonshine_god recipe: script/plugin install  git://github.com/railsmachine/moonshine_god.git and redeploy"
+    if configuration[:sphinx][:use_god]
+      if respond_to?(:god)
+        # We need god in our lives to start/stop/monitor searchd
+        recipe :god
+      else
+        raise "Could not find god recipe, aborting. Please install moonshine_god recipe: script/plugin install  git://github.com/railsmachine/moonshine_god.git and redeploy"
+      end
     end
 
     configure :sphinx => YAML::load(template(sphinx_template_dir + 'sphinx.yml', binding))
@@ -113,11 +115,13 @@ module Sphinx
       :postrotate => "#{postrotate}\n    pkill -USR1 searchd"
      })
 
-     file "/etc/god/#{configuration[:application]}-sphinx.god",
-       :ensure => :present,
-       :require => file('/etc/god/god.conf'),
-       :content => template(sphinx_template_dir.join('sphinx.god')),
-       :notify => exec('restart_god')
+     if configuration[:sphinx][:use_god]
+       file "/etc/god/#{configuration[:application]}-sphinx.god",
+         :ensure => :present,
+         :require => file('/etc/god/god.conf'),
+         :content => template(sphinx_template_dir.join('sphinx.god')),
+         :notify => exec('restart_god')
+     end
 
      unless configuration[:sphinx][:index_cron] == false
        current_rails_root = "#{configuration[:deploy_to]}/current"
