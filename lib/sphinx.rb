@@ -37,8 +37,8 @@ module Sphinx
   #  recipe :sphinx
   def sphinx(options = {})
     if respond_to?(:god)
-      # We need god in our lives to start/stop/monitor searchd
-      recipe :god
+      # We need god in our lives to start/stop/monitor searchd... but only once
+      recipe :god unless self.class.recipes.any? {|(recipe, options)| recipe == :god }
     else
       raise "Could not find god recipe, aborting. Please install moonshine_god recipe: script/plugin install  git://github.com/railsmachine/moonshine_god.git and redeploy"
     end
