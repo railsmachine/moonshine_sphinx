@@ -6,6 +6,7 @@
   query_log: <%= configuration[:deploy_to] %>/shared/log/searchd.query.log
   pid_file: <%= configuration[:deploy_to] %>/shared/log/searchd.pid
   bin_path: /usr/local/bin
+  version: <%= configuration[:sphinx][:version][/(\d+\.\d+(\.\d+|(?:-dev|(\-id64)?\-beta)))/, 1] %>
   <% if configuration[:sphinx][:extra] %>
     <% configuration[:sphinx][:extra].each do |option, value| %>
   <%= "#{option.to_s}: #{value}" %>
