@@ -99,16 +99,16 @@ module Sphinx
 
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/downloads/sphinx-#{options[:version]}.tar.gz",
-        "tar xzf sphinx-#{options[:version]}.tar.gz",
-        "cd sphinx-#{options[:version]}",
+        "wget http://sphinxsearch.com/downloads/sphinx-#{configuration[:sphinx][:version]}.tar.gz",
+        "tar xzf sphinx-#{configuration[:sphinx][:version]}.tar.gz",
+        "cd sphinx-#{configuration[:sphinx][:version]}",
         './configure',
         'make',
         'make install'
       ].join(' && '),
       :cwd => '/tmp',
       :require => package('wget'),
-      :unless => "test -f /usr/local/bin/searchd && test #{options[:version]} = `searchd --help | grep Sphinx | awk '{print $2}' | awk -F- '{print $1}'`"
+      :unless => "test -f /usr/local/bin/searchd && test #{configuration[:sphinx][:version]} = `searchd --help | grep Sphinx | awk '{print $2}' | awk -F- '{print $1}'`"
 
     postrotate = configuration[:rails_logrotate][:postrotate] || "touch #{configuration[:deploy_to]}/current/tmp/restart.txt"
     configure(:rails_logrotate => {
