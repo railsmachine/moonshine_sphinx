@@ -30,3 +30,12 @@ namespace :sphinx do
   end
 
 end
+
+before 'deploy' do
+  # do the sphinx things moonshine would normally do
+  if ! fetch(:moonshine_apply, true)
+    after 'deploy:finalize_update', 'sphinx:symlink_indexes'
+    before 'god:restart', 'sphinx:configure'
+    before 'god:restart', 'sphinx:stop'
+  end
+end
