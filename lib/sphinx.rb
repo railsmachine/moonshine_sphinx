@@ -147,7 +147,8 @@ module Sphinx
 
     file rails_root + 'config/sphinx.yml',
       :ensure => sphinx_yml.to_s,
-      :require => file(sphinx_yml.to_s)
+      :require => file(sphinx_yml.to_s),
+      :before => exec('rake tasks')
   end
 
 end
