@@ -13,9 +13,9 @@ A plugin for installing and managing sphinx for a Rails application using thinki
 moonshine_sphinx requires:
 
 * At least revision cf2c44881e49633a8507149024e1f2dcbf63335e[http://github.com/railsmachine/moonshine/commit/cf2c44881e49633a8507149024e1f2dcbf63335e] of moonshine
+* thinking_sphinx installed and configured 
 * moonshine_god to be installed as a plugin
 ** moonshine_god can be disabled by setting :use_god: false in moonshine.yml
-* thinking_sphinx installed and configured
 
 === Instructions
 
@@ -36,3 +36,5 @@ moonshine_sphinx requires:
         :mem_limit: 256M
 * Include the recipe in your Moonshine manifest:
     recipe :sphinx
+* Include capistrano callback to restart sphinx after god restarts:
+    after 'god:restart', 'sphinx:restart'
