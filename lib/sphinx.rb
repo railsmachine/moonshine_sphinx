@@ -115,24 +115,24 @@ module Sphinx
       :postrotate => "#{postrotate}\n    pkill -USR1 searchd"
      })
 
-     if configuration[:sphinx][:use_god]
-       file "/etc/god/#{configuration[:application]}-sphinx.god",
-         :ensure => :present,
-         :require => file('/etc/god/god.conf'),
-         :content => template(sphinx_template_dir.join('sphinx.god')),
-         :notify => exec('restart_god')
-     end
+    if configuration[:sphinx][:use_god]
+      file "/etc/god/#{configuration[:application]}-sphinx.god",
+        :ensure => :present,
+        :require => file('/etc/god/god.conf'),
+        :content => template(sphinx_template_dir.join('sphinx.god')),
+        :notify => exec('restart_god')
+    end
 
-     unless configuration[:sphinx][:index_cron] == false
-       current_rails_root = "#{configuration[:deploy_to]}/current"
-       thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
-       cron_options = {
-         :command => thinking_sphinx_index,
-         :user => configuration[:user]
-       }.merge(configuration[:sphinx][:index_cron] || {:minute => 9}) # Set default here instead of in included so that :minute doesn't get deep_merged with user settings
+    unless configuration[:sphinx][:index_cron] == false
+      current_rails_root = "#{configuration[:deploy_to]}/current"
+      thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
+      cron_options = {
+        :command => thinking_sphinx_index,
+        :user => configuration[:user]
+      }.merge(configuration[:sphinx][:index_cron] || {:minute => 9}) # Set default here instead of in included so that :minute doesn't get deep_merged with user settings
 
-       cron "thinking_sphinx:index", cron_options
-     end
+      cron "thinking_sphinx:index", cron_options
+    end
   end
 
   # Just configure sphinx.yml. Useful on app servers when sphinx is on a shared
