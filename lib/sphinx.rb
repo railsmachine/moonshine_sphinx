@@ -124,7 +124,7 @@ module Sphinx
 
     unless configuration[:sphinx][:index_cron] == false
       current_rails_root = "#{configuration[:deploy_to]}/current"
-      thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
+      thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} bundle exec rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
       cron_options = {
         :command => thinking_sphinx_index,
         :user => configuration[:user]
