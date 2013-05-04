@@ -26,6 +26,7 @@ moonshine_sphinx requires:
 * Configure settings as needed:
     # in config/moonshine.yml
     :sphinx:
+      # version > 0.9.9 you need to append <tt>-beta</tt> or <tt>-release</tt> e.g. <tt>:version: 2.0.8-release</tt>
       :version: 0.9.8.1
       # index every hour at 9
       :index_cron:
