@@ -68,7 +68,7 @@ module Sphinx
       :mode => '664',
       :alias => 'searchd shared files'
 
-    rake "thinking_sphinx:configure",
+    rake "ts:configure",
       :refreshonly => true,
       :subscribe => file(sphinx_yml),
       :require => [
@@ -84,10 +84,10 @@ module Sphinx
       :mode => '664'
 
     unless configuration[:sphinx][:index_on_deploy] == false
-      rake "thinking_sphinx:index",
+      rake "ts:index",
         :require => [
           file(sphinx_configuration[:searchd_files]),
-          exec('rake thinking_sphinx:configure'),
+          exec('rake ts:configure'),
           exec('rake db:migrate'),
           exec('sphinx'),
           exec('rails_gems')
@@ -99,7 +99,7 @@ module Sphinx
 
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/downloads/sphinx-#{configuration[:sphinx][:version]}.tar.gz",
+        "wget http://sphinxsearch.com/files/sphinx-#{configuration[:sphinx][:version]}.tar.gz",
         "tar xzf sphinx-#{configuration[:sphinx][:version]}.tar.gz",
         "cd sphinx-#{configuration[:sphinx][:version]}",
         './configure',
@@ -124,13 +124,13 @@ module Sphinx
 
     unless configuration[:sphinx][:index_cron] == false
       current_rails_root = "#{configuration[:deploy_to]}/current"
-      thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} bundle exec rake thinking_sphinx:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
+      thinking_sphinx_index = "(date && cd #{current_rails_root} && RAILS_ENV=#{rails_env} bundle exec rake ts:index) >> #{current_rails_root}/log/cron-thinking_sphinx-index.log 2>&1"
       cron_options = {
         :command => thinking_sphinx_index,
         :user => configuration[:user]
       }.merge(configuration[:sphinx][:index_cron] || {:minute => 9}) # Set default here instead of in included so that :minute doesn't get deep_merged with user settings
 
-      cron "thinking_sphinx:index", cron_options
+      cron "ts:index", cron_options
     end
   end
 
