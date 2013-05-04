@@ -99,7 +99,7 @@ module Sphinx
 
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/downloads/sphinx-#{configuration[:sphinx][:version]}.tar.gz",
+        "wget http://sphinxsearch.com/files/sphinx-#{configuration[:sphinx][:version]}.tar.gz",
         "tar xzf sphinx-#{configuration[:sphinx][:version]}.tar.gz",
         "cd sphinx-#{configuration[:sphinx][:version]}",
         './configure',
