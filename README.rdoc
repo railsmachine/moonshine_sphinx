@@ -26,7 +26,7 @@ moonshine_sphinx requires:
 * Configure settings as needed:
     # in config/moonshine.yml
     :sphinx:
-      :version: 0.9.8.1
+      :version: 2.0.8
       # index every hour at 9
       :index_cron:
         :minute: 9
