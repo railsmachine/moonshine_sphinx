@@ -97,18 +97,26 @@ module Sphinx
 
     package 'wget', :ensure => :installed
 
+    version = configuration[:sphinx][:version]
+    file_version = "#{version}"
+    if file_version =~ /beta/
+      version = file_version.split("-").first
+    else
+      file_version = "#{version}-release" if version =~ /^2/
+    end
+
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/downloads/sphinx-#{configuration[:sphinx][:version]}.tar.gz",
-        "tar xzf sphinx-#{configuration[:sphinx][:version]}.tar.gz",
-        "cd sphinx-#{configuration[:sphinx][:version]}",
+        "wget http://sphinxsearch.com/files/sphinx-#{file_version}.tar.gz",
+        "tar xzf sphinx-#{file_version}.tar.gz",
+        "cd sphinx-#{file_version}",
         './configure',
         'make',
         'make install'
       ].join(' && '),
       :cwd => '/tmp',
       :require => package('wget'),
-      :unless => "test -f /usr/local/bin/searchd && test #{configuration[:sphinx][:version]} = `searchd --help | grep Sphinx | awk '{print $2}' | awk -F- '{print $1}'`"
+      :unless => "test -f /usr/local/bin/searchd && test #{version} = `searchd --help | head -n1 | awk '{print $2}' | awk -F- '{print $1}'`"
 
     postrotate = configuration[:rails_logrotate][:postrotate] || "touch #{configuration[:deploy_to]}/current/tmp/restart.txt"
     configure(:rails_logrotate => {
