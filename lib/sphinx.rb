@@ -14,7 +14,7 @@ module Sphinx
 
   module ClassMethods
     def sphinx_yml
-      @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + 'shared/config/sphinx.yml'
+      @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + 'shared/config/thinking_sphinx.yml'
     end
 
     def sphinx_configuration
@@ -45,7 +45,7 @@ module Sphinx
       end
     end
 
-    configure :sphinx => YAML::load(template(sphinx_template_dir + 'sphinx.yml', binding))
+    configure :sphinx => YAML::load(template(sphinx_template_dir + 'thinking_sphinx.yml', binding))
     sphinx_config_only
 
     [:searchd_files, :searchd_file_path].each do |config|
@@ -142,17 +142,17 @@ module Sphinx
     end
   end
 
-  # Just configure sphinx.yml. Useful on app servers when sphinx is on a shared
+  # Just configure thinking_sphinx.yml. Useful on app servers when sphinx is on a shared
   # server
   def sphinx_config_only
     file sphinx_yml.to_s,
-      :content => template(sphinx_template_dir.join('sphinx.yml')),
+      :content => template(sphinx_template_dir.join('thinking_sphinx.yml')),
       :ensure => :file,
       :owner => configuration[:user],
       :group => configuration[:group] || configuration[:user],
       :mode => '664'
 
-    file rails_root + 'config/sphinx.yml',
+    file rails_root + 'config/thinking_sphinx.yml',
       :ensure => sphinx_yml.to_s,
       :require => file(sphinx_yml.to_s),
       :before => exec('rake tasks')
