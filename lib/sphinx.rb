@@ -77,7 +77,7 @@ module Sphinx
         file('searchd shared files')
       ]
 
-    file sphinx_configuration[:config_file],
+    file sphinx_configuration[:configuration_file],
       :ensure => :file,
       :owner => configuration[:user],
       :group => configuration[:group] || configuration[:user],
@@ -92,7 +92,7 @@ module Sphinx
           exec('sphinx'),
           exec('rails_gems')
         ],
-        :subscribe => file(sphinx_configuration[:config_file])
+        :subscribe => file(sphinx_configuration[:configuration_file])
     end
 
     package 'wget', :ensure => :installed
