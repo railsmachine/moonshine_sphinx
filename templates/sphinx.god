@@ -8,9 +8,9 @@ God.watch do |w|
 
   w.env = { 'RAILS_ENV' => RAILS_ENV }
 
-  w.start         = "searchd --config <%= sphinx_configuration[:config_file] %>"
+  w.start         = "searchd --config <%= sphinx_configuration[:configuration_file] %>"
   w.start_grace   = 10.seconds
-  w.stop          = "searchd --config <%= sphinx_configuration[:config_file] %> --stop"
+  w.stop          = "searchd --config <%= sphinx_configuration[:configuration_file] %> --stop"
   w.stop_grace    = 10.seconds
   w.restart       = w.stop + " && " + w.start
   w.restart_grace = 15.seconds

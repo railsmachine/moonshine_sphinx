@@ -1,7 +1,7 @@
 <%= rails_env %>:
   searchd_file_path: <%= configuration[:deploy_to] %>/shared/sphinx/<%= rails_env %>
   searchd_files: <%= configuration[:deploy_to] %>/shared/sphinx/<%= rails_env %>
-  config_file: <%= configuration[:deploy_to] %>/shared/config/sphinx.conf
+  configuration_file: <%= configuration[:deploy_to] %>/shared/config/sphinx.conf
   log: <%= configuration[:deploy_to] %>/shared/log/searchd.log
   query_log: <%= configuration[:deploy_to] %>/shared/log/searchd.query.log
   pid_file: <%= configuration[:deploy_to] %>/shared/log/searchd.pid

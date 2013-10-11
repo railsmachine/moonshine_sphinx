@@ -31,7 +31,7 @@ moonshine_sphinx requires:
       :index_cron:
         :minute: 9
       :extra:
-        # these settings are loaded as if they were in your sphinx.yml
+        # these settings are loaded as if they were in your thinking_sphinx.yml
         :address: 127.0.0.1
         :mem_limit: 256M
 * Include the recipe in your Moonshine manifest:
