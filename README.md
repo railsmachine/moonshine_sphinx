@@ -39,9 +39,9 @@ It handles:
         :mem_limit: 256M
 </code></pre>
 * Include the recipe in your Moonshine manifest:
-    recipe :sphinx
+  <tt>recipe :sphinx</tt>
 * Include capistrano callback to restart sphinx after god restarts:
-    after 'god:restart', 'sphinx:restart'
+  <tt>after 'god:restart', 'sphinx:restart'</tt>
     
 ***
 Unless otherwise specified, all content copyright &copy; 2014, [Rails Machine, LLC](http://railsmachine.com)
