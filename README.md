@@ -1,6 +1,6 @@
 ## Moonshine_Sphinx
 
-### A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+### A plugin for [Moonshine](http://github.com/railsmachine/moonshine)
 A plugin for installing and managing sphinx for a Rails application using thinking_sphinx.
 
 
@@ -14,7 +14,7 @@ It handles:
 
 #### moonshine_sphinx requires:
 
-- At least revision cf2c44881e49633a8507149024e1f2dcbf63335e[http://github.com/railsmachine/moonshine/commit/cf2c44881e49633a8507149024e1f2dcbf63335e] of moonshine
+- At least revision [cf2c44881e49633a8507149024e1f2dcbf63335e](http://github.com/railsmachine/moonshine/commit/cf2c44881e49633a8507149024e1f2dcbf63335e) of moonshine
 - thinking_sphinx installed and configured
 - moonshine_god to be installed as a plugin
 - moonshine_god can be disabled by setting <tt>:use_god: false</tt> in moonshine.yml
