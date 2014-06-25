@@ -107,7 +107,7 @@ module Sphinx
 
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/files/sphinx-#{file_version}.tar.gz",
+        "wget http://sphinxsearch.com/files/archive/sphinx-#{file_version}.tar.gz",
         "tar xzf sphinx-#{file_version}.tar.gz",
         "cd sphinx-#{file_version}",
         './configure',
