@@ -14,7 +14,8 @@ module Sphinx
 
   module ClassMethods
     def sphinx_yml
-      @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + 'shared/config/thinking_sphinx.yml'
+      configuration[:sphinx][:sphinx_yml] ||= 'thinking_sphinx.yml'
+      @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + "shared/config/#{configuration[:sphinx][:sphinx_yml]}"
     end
 
     def sphinx_configuration
@@ -105,9 +106,11 @@ module Sphinx
       file_version = "#{version}-release" if version =~ /^2/
     end
 
+    sphinx_version = Gem::Version.new(version)
+    ver2 = Gem::Version.new('2.0')
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/files/archive/sphinx-#{file_version}.tar.gz",
+        "wget http://sphinxsearch.com/files#{'/archive' if sphinx_version < ver2 }/sphinx-#{file_version}.tar.gz",
         "tar xzf sphinx-#{file_version}.tar.gz",
         "cd sphinx-#{file_version}",
         './configure',
@@ -152,7 +155,7 @@ module Sphinx
       :group => configuration[:group] || configuration[:user],
       :mode => '664'
 
-    file rails_root + 'config/thinking_sphinx.yml',
+    file rails_root + "config/#{configuration[:sphinx][:sphinx_yml]}",
       :ensure => sphinx_yml.to_s,
       :require => file(sphinx_yml.to_s),
       :before => exec('rake tasks')
