@@ -6,7 +6,7 @@ module Sphinx
     manifest.class_eval do
       extend ClassMethods
 
-      configure :sphinx => { :version => '0.9.8.1', :extra => {}, :use_god => true }
+      configure :sphinx => { :version => '0.9.8.1', :extra => {}, :use_god => true, :sphinx_yml => 'thinking_sphinx.yml' }
       configure :rails_logrotate => {}
 
     end
@@ -14,7 +14,6 @@ module Sphinx
 
   module ClassMethods
     def sphinx_yml
-      configuration[:sphinx][:sphinx_yml] ||= 'thinking_sphinx.yml'
       @sphinx_yml ||= Pathname.new(configuration[:deploy_to]) + "shared/config/#{configuration[:sphinx][:sphinx_yml]}"
     end
 
@@ -106,19 +105,47 @@ module Sphinx
       file_version = "#{version}-release" if version =~ /^2/
     end
 
+    libstemmer = configuration[:sphinx][:libstemmer] || false
+
     sphinx_version = Gem::Version.new(version)
     ver2 = Gem::Version.new('2.0')
+    exec 'download sphinx',
+      :command => "wget http://sphinxsearch.com/files#{'/archive' if sphinx_version < ver2 }/sphinx-#{file_version}.tar.gz",
+      :cwd => '/tmp',
+      :require => package('wget'),
+      :unless => "test -f /usr/local/bin/searchd && test #{version} = `searchd --help | head -n1 | awk '{print $2}' | awk -F- '{print $1}'`"
+
+    exec 'extract sphinx',
+      :command => "tar xzf sphinx-#{file_version}.tar.gz",
+      :cwd => '/tmp',
+      :require => exec('download sphinx'),
+      :unless => "test -f /usr/local/bin/searchd && test #{version} = `searchd --help | head -n1 | awk '{print $2}' | awk -F- '{print $1}'`"
+
+    if libstemmer
+      exec 'download and extract libstemmer',
+        :command => [
+          "wget http://snowball.tartarus.org/dist/libstemmer_c.tgz",
+          "tar xzf libstemmer_c.tgz",
+          "cp -R libstemmer_c/* sphinx-#{file_version}/libstemmer_c/"
+        ].join(' && '),
+        :cwd => '/tmp',
+        :require => exec('extract sphinx'),
+        :unless => "test -f /usr/local/bin/searchd && test #{version} = `searchd --help | head -n1 | awk '{print $2}' | awk -F- '{print $1}'`"
+    else
+      exec 'download and extract libstemmer',
+        :command => 'true',
+        :require => exec('extract sphinx'),
+        :unless => "test -f /usr/local/bin/searchd && test #{version} = `searchd --help | head -n1 | awk '{print $2}' | awk -F- '{print $1}'`"
+    end
+
     exec 'sphinx',
       :command => [
-        "wget http://sphinxsearch.com/files#{'/archive' if sphinx_version < ver2 }/sphinx-#{file_version}.tar.gz",
-        "tar xzf sphinx-#{file_version}.tar.gz",
-        "cd sphinx-#{file_version}",
-        './configure',
+        "./configure #{ '--with-libstemmer' if libstemmer}",
         'make',
         'make install'
       ].join(' && '),
-      :cwd => '/tmp',
-      :require => package('wget'),
+      :cwd => "/tmp/sphinx-#{file_version}",
+      :require => [exec('extract sphinx'), exec('download and extract libstemmer')],
       :unless => "test -f /usr/local/bin/searchd && test #{version} = `searchd --help | head -n1 | awk '{print $2}' | awk -F- '{print $1}'`"
 
     postrotate = configuration[:rails_logrotate][:postrotate] || "touch #{configuration[:deploy_to]}/current/tmp/restart.txt"
